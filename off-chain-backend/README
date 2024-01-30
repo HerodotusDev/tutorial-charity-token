@@ -1,0 +1,9 @@
+This part runs an off-chain backend that connects to Herodotus API to prove data onchain.
+
+To run it you wil need [deno](https://deno.com/) installed. Then run:
+
+```
+deno task dev
+```
+
+This will start 2 crons which. The first one listens to the Donation events from the Charity contract on Ethereum Goerli.
