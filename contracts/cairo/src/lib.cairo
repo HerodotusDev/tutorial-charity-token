@@ -7,8 +7,9 @@ trait ICharityToken<TContractState> {
 mod CharityToken {
     use openzeppelin::token::erc20::ERC20Component;
     use starknet::ContractAddress;
-    use super::FactsRegistryDispatcher;
-    use super::FactsRegistryDispatcherTrait;
+    use herodotus_eth_starknet::core::evm_facts_registry::{
+        IEVMFactsRegistryDispatcherTrait, IEVMFactsRegistryDispatcher
+    };
 
     component!(path: ERC20Component, storage: erc20, event: ERC20Event);
 
@@ -65,7 +66,7 @@ mod CharityToken {
 
             let claimer_slot = amount_slot + 1;
             // TODO get slot value from herodotus
-            let claimer = FactsRegistryDispatcher {
+            let claimer = IEVMFactsRegistryDispatcher {
                 contract_address: self.herodotus_facts_registry.read()
             }
                 .get_slot_value(account, block, claimer_slot);
