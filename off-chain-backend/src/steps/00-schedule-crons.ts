@@ -60,6 +60,11 @@ async function scrapeDonations() {
     });
 
     const slots = getSlots(benefactor);
+    console.log("Things you will need to verify proof onchain:", {
+      account: benefactor,
+      blockNumber: emittedAtBlockNumber,
+      amountSlot: slots.amountSlot,
+    });
     const herodotusQueryId = await proveWithHerodotus(
       slots,
       emittedAtBlockNumber
