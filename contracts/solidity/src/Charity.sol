@@ -2,23 +2,29 @@
 pragma solidity ^0.8.21;
 
 contract Charity {
-    event Donation(address benefactor, uint256 amount);
+    struct DonationInfo {
+        uint256 starknetAddress;
+        uint256 amount;
+    }
 
-    mapping(address => uint256) public benefactors;
+    event Donation(address benefactor, uint256 amount, uint256 starknetAddress);
+
+    mapping(address => DonationInfo) public benefactors;
     address private _owner;
 
     constructor() {
         _owner = msg.sender;
     }
 
-    function donate() external payable {
-        require(msg.value > 0, "Pls gib more money...");
+    function donate(uint256 starknetAddress) external payable {
+        require(msg.value > 0, "Pls gib more money :c");
 
         // Record or accumulate the donation amount for the sender
-        benefactors[msg.sender] += msg.value;
+        benefactors[msg.sender].amount += msg.value;
+        benefactors[msg.sender].starknetAddress = starknetAddress;
 
         // Emit the Donation event
-        emit Donation(msg.sender, msg.value);
+        emit Donation(msg.sender, msg.value, starknetAddress);
     }
 
     function withdraw_all() external {
