@@ -1,15 +1,23 @@
 #[starknet::interface]
+trait IEvmFactsRegistry<TContractState> {
+    fn get_slot_value(
+        self: @TContractState, account: felt252, block: u256, slot: u256
+    ) -> Option<u256>;
+}
+
+#[starknet::interface]
 trait ICharityToken<TContractState> {
     fn claim(ref self: TContractState, account: felt252, block: u256, amount_slot: u256);
 }
 
 #[starknet::contract]
 mod CharityToken {
+    use core::traits::TryInto;
+    use core::traits::Into;
+    use core::option::OptionTrait;
     use openzeppelin::token::erc20::ERC20Component;
     use starknet::ContractAddress;
-    use herodotus_eth_starknet::core::evm_facts_registry::{
-        IEVMFactsRegistryDispatcherTrait, IEVMFactsRegistryDispatcher
-    };
+    use super::{IEvmFactsRegistryDispatcherTrait, IEvmFactsRegistryDispatcher};
 
     component!(path: ERC20Component, storage: erc20, event: ERC20Event);
 
@@ -46,17 +54,23 @@ mod CharityToken {
     }
 
     #[constructor]
-    fn constructor(
-        ref self: ContractState,
-        name: felt252,
-        symbol: felt252,
-        fixed_supply: u256,
-        recipient: ContractAddress,
-        herodotus_facts_registry: ContractAddress,
-    ) {
-        self.erc20.initializer(name, symbol);
-        self.erc20._mint(recipient, fixed_supply);
-        self.herodotus_facts_registry.write(herodotus_facts_registry);
+    fn constructor(ref self: ContractState) {
+        self.erc20.initializer('CharityToken', 'HER');
+        self
+            .erc20
+            ._mint(
+                0x0278619D391034A091b099C6Fd53A3Dc56859196f9aC67bE75B3AD3Bff4869f6
+                    .try_into()
+                    .unwrap(),
+                69420
+            );
+        self
+            .herodotus_facts_registry
+            .write(
+                0x01b2111317EB693c3EE46633edd45A4876db14A3a53ACDBf4E5166976d8e869d
+                    .try_into()
+                    .unwrap()
+            );
     }
 
     #[external(v0)]
@@ -65,18 +79,21 @@ mod CharityToken {
             let caller = starknet::get_caller_address();
 
             let claimer_slot = amount_slot + 1;
-            // TODO get slot value from herodotus
-            let claimer = IEVMFactsRegistryDispatcher {
+            let claimer = IEvmFactsRegistryDispatcher {
                 contract_address: self.herodotus_facts_registry.read()
             }
-                .get_slot_value(account, block, claimer_slot);
+                .get_slot_value(account, block, claimer_slot)
+                .unwrap();
 
-            assert(caller == claimer, 'This isn\'t your airdrop!');
+            let caller_felt: felt252 = caller.into();
+            assert(caller_felt.into() == claimer, 'This isn\'t your airdrop!');
 
-            // TODO get slot value from herodotus
-            let donation_amount: u256 = 2000;
+            let donation_amount: u256 = IEvmFactsRegistryDispatcher {
+                contract_address: self.herodotus_facts_registry.read()
+            }
+                .get_slot_value(account, block, amount_slot)
+                .unwrap();
             let airdrop_amount = donation_amount * AIRDROP_DONATION_MULTIPLIER;
-
             assert(donation_amount > AIRDROP_ELIGIBILITY_THRESHOLD, 'You haven\'t donated enough!');
 
             let already_claimed = match self.claimed_aidrop.read(account) {

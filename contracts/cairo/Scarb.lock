@@ -2,33 +2,13 @@
 version = 1
 
 [[package]]
-name = "cairo_lib"
-version = "0.2.0"
-source = "git+https://github.com/HerodotusDev/cairo-lib.git#a0c0ee4feeb4edb61e7a35d29595ad8647c3d469"
-
-[[package]]
 name = "charity_reward"
 version = "0.1.0"
 dependencies = [
- "herodotus_eth_starknet",
  "openzeppelin",
-]
-
-[[package]]
-name = "herodotus_eth_starknet"
-version = "0.1.0"
-source = "git+https://github.com/HerodotusDev/herodotus-on-starknet.git#a34c6f8cac83e9d3ca1d2d6a815bbd30ebcdd406"
-dependencies = [
- "cairo_lib",
- "snforge_std",
 ]
 
 [[package]]
 name = "openzeppelin"
 version = "0.8.1"
 source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.8.1#5c7a022f333dca721fe490c2191a811fa2566a89"
-
-[[package]]
-name = "snforge_std"
-version = "0.1.0"
-source = "git+https://github.com/foundry-rs/starknet-foundry.git?tag=v0.4.1#49ae9dce0b9cecf43f5f4e830a3d61f462bdae69"

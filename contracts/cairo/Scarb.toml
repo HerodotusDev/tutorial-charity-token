@@ -3,5 +3,7 @@ name = "charity_reward"
 version = "0.1.0"
 
 [dependencies]
+starknet = "=2.4.1"
 openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.8.1" }
-herodotus_eth_starknet = { git = "https://github.com/HerodotusDev/herodotus-on-starknet.git" }
+
+[[target.starknet-contract]]
